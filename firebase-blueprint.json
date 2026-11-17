@@ -1,0 +1,182 @@
+{
+  "entities": {
+    "StudioSnapshotSummary": {
+      "title": "StudioSnapshotSummary",
+      "description": "Compact read-optimized metadata summarizing a saved Aether Tactile Studio snapshot.",
+      "type": "object",
+      "properties": {
+        "palette": {
+          "type": "string",
+          "description": "Active color palette mode at the time of snapshot creation.",
+          "enum": ["pearl-flebologia", "finance-ice", "emerald-clinic"],
+          "minLength": 1,
+          "maxLength": 40
+        },
+        "material": {
+          "type": "string",
+          "description": "Active haptic surface material profile.",
+          "enum": ["shiny-glass", "frosted-glass", "matte-metal", "abs-plastic", "suede"],
+          "minLength": 1,
+          "maxLength": 40
+        },
+        "baseFreqHz": {
+          "type": "number",
+          "description": "Sub-160 Hz primary click tone frequency."
+        },
+        "screenCount": {
+          "type": "number",
+          "description": "Number of designed screens in the active screen map."
+        },
+        "edgeCount": {
+          "type": "number",
+          "description": "Number of navigation edges in the active screen map."
+        }
+      },
+      "required": ["palette", "material", "baseFreqHz", "screenCount", "edgeCount"]
+    },
+    "StudioSnapshotState": {
+      "title": "StudioSnapshotState",
+      "description": "Complete native configuration state of Aether Tactile Studio.",
+      "type": "object",
+      "properties": {
+        "palette": {
+          "type": "string",
+          "enum": ["pearl-flebologia", "finance-ice", "emerald-clinic"],
+          "minLength": 1,
+          "maxLength": 40
+        },
+        "activeScreenTransition": {
+          "type": "string",
+          "description": "Selected screen-to-screen physics preset identifier.",
+          "minLength": 1,
+          "maxLength": 64
+        },
+        "selectedGroups": {
+          "type": "array",
+          "description": "Selected button group identifiers (max 6)."
+        },
+        "depth": {
+          "type": "object",
+          "description": "Elevation, glass blur, opacity, border radius, and specular rim settings."
+        },
+        "synth": {
+          "type": "object",
+          "description": "Acoustic synthesizer settings including sub-160 Hz click tone."
+        },
+        "haptic": {
+          "type": "object",
+          "description": "Haptic intensity, duration, material profile, Shore hardness, and clutch parameters."
+        },
+        "engraving": {
+          "type": "object",
+          "description": "Laser engraving symbol and optical backlight configuration."
+        },
+        "animation": {
+          "type": "object",
+          "description": "Spring motion physics and illumination preset configuration."
+        },
+        "groupConfigs": {
+          "type": "object",
+          "description": "Per-group material, pitch offset, glow color, and symbol overrides."
+        },
+        "driverCalibration": {
+          "type": "object",
+          "description": "Rotary CNC controller click and haptic detent calibration settings."
+        },
+        "screenMap": {
+          "type": "object",
+          "description": "Active application screen architecture map (nodes and directed edges)."
+        }
+      },
+      "required": [
+        "palette",
+        "activeScreenTransition",
+        "selectedGroups",
+        "depth",
+        "synth",
+        "haptic",
+        "engraving",
+        "animation",
+        "groupConfigs",
+        "driverCalibration",
+        "screenMap"
+      ]
+    },
+    "StudioSnapshot": {
+      "title": "StudioSnapshot",
+      "description": "Immutable-core version history snapshot of the user's entire Aether Tactile Studio configuration.",
+      "type": "object",
+      "properties": {
+        "ownerId": {
+          "type": "string",
+          "description": "Firebase Auth UID of the snapshot creator and sole owner.",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^[a-zA-Z0-9_-]+$"
+        },
+        "label": {
+          "type": "string",
+          "description": "Human-readable snapshot title.",
+          "minLength": 1,
+          "maxLength": 160
+        },
+        "note": {
+          "type": "string",
+          "description": "Optional changelog note describing configuration adjustments.",
+          "minLength": 0,
+          "maxLength": 600
+        },
+        "versionTag": {
+          "type": "string",
+          "description": "Semantic version tag for the snapshot (e.g. v1.0, v1.2).",
+          "minLength": 2,
+          "maxLength": 32,
+          "pattern": "^v[0-9]+[.][0-9]+([.][0-9]+)?$"
+        },
+        "isPinned": {
+          "type": "boolean",
+          "description": "Whether this snapshot is pinned at the top of Version History."
+        },
+        "summary": {
+          "type": "object",
+          "$ref": "#/entities/StudioSnapshotSummary",
+          "description": "Compact summary metrics for timeline display."
+        },
+        "state": {
+          "type": "object",
+          "$ref": "#/entities/StudioSnapshotState",
+          "description": "Complete native Studio configuration map."
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Server timestamp when the snapshot was created."
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Server timestamp when snapshot metadata was last updated."
+        }
+      },
+      "required": [
+        "ownerId",
+        "label",
+        "note",
+        "versionTag",
+        "isPinned",
+        "summary",
+        "state",
+        "createdAt",
+        "updatedAt"
+      ]
+    }
+  },
+  "firestore": {
+    "/studio_snapshots/{snapshotId}": {
+      "schema": {
+        "$ref": "#/entities/StudioSnapshot"
+      },
+      "description": "Per-user studio configuration snapshots for the Dashboard Version History panel."
+    }
+  }
+}

@@ -1,0 +1,10 @@
+{
+  "name": "Remix Aether Tactile Studio",
+  "description": "Interaktywne studio projektowania UI/UX z syntezatorem dźwięku przycisków Aether, fizyką haptyczną szkła i metalu, wizualizacją 3D Three.js oraz pakietem multimodalnym Gemini.",
+  "requestFramePermissions": [
+    "microphone"
+  ],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}

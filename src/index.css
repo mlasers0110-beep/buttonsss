@@ -1,0 +1,122 @@
+@import "tailwindcss";
+@custom-variant dark (&:where(.dark, .dark *));
+
+@layer base {
+  :root {
+    --font-sans: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+    --font-serif: 'Cormorant Garamond', Georgia, serif;
+    --font-mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, monospace;
+  }
+
+  body {
+    font-family: var(--font-sans);
+    overflow-x: hidden;
+  }
+
+  h1, h2, .font-editorial {
+    font-family: var(--font-serif);
+    text-wrap: balance;
+  }
+
+  .tabular-nums {
+    font-variant-numeric: tabular-nums;
+  }
+}
+
+@keyframes shimmerSlide {
+  0% {
+    transform: translateX(-100%);
+  }
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+@keyframes aetherBorderSpin {
+  0% {
+    transform: translate(-50%, -50%) rotate(0deg);
+  }
+  100% {
+    transform: translate(-50%, -50%) rotate(360deg);
+  }
+}
+
+@keyframes aetherPrismSweep {
+  0% {
+    transform: translateX(-145%) skewX(-20deg);
+    opacity: 0;
+  }
+  20% {
+    opacity: 0.92;
+  }
+  78% {
+    opacity: 0.92;
+  }
+  100% {
+    transform: translateX(255%) skewX(-20deg);
+    opacity: 0;
+  }
+}
+
+@keyframes aetherEtchBreathe {
+  0%,
+  100% {
+    opacity: 0.42;
+    transform: scale(0.99);
+  }
+  50% {
+    opacity: 0.96;
+    transform: scale(1.012);
+  }
+}
+
+@keyframes aetherActiveHalo {
+  0%,
+  100% {
+    opacity: 0.78;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+.animate-shimmer {
+  animation: shimmerSlide 1.6s cubic-bezier(0.16, 1, 0.3, 1) infinite;
+}
+
+.animate-border-beam {
+  animation: aetherBorderSpin 3.4s linear infinite;
+}
+
+.animate-prism-sweep {
+  animation: aetherPrismSweep 2.5s cubic-bezier(0.16, 1, 0.3, 1) infinite;
+}
+
+.animate-etch-breathe {
+  animation: aetherEtchBreathe 2.9s ease-in-out infinite;
+}
+
+.animate-active-halo {
+  animation: aetherActiveHalo 2.2s ease-in-out infinite;
+}
+
+.aether-fresnel-top {
+  background: linear-gradient(
+    90deg,
+    transparent 4%,
+    rgba(255, 255, 255, 0.92) 50%,
+    transparent 96%
+  );
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-shimmer,
+  .animate-border-beam,
+  .animate-prism-sweep,
+  .animate-etch-breathe,
+  .animate-active-halo {
+    animation: none !important;
+  }
+}
+
+

@@ -1,0 +1,381 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Global Default-Deny Safety Net
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    // Hardened Global Primitives
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isEmailVerified() {
+      return isSignedIn() && request.auth.token.email_verified == true;
+    }
+
+    function isValidId(id) {
+      return id is string && id.size() >= 1 && id.size() <= 128 && id.matches('^[a-zA-Z0-9_-]+$');
+    }
+
+    function incoming() {
+      return request.resource.data;
+    }
+
+    function existing() {
+      return resource.data;
+    }
+
+    // Strict Nested Map Validation Helpers (Synced Verbatim with firebase-blueprint.json)
+    function isValidSnapshotSummary(summary) {
+      return summary is map &&
+        summary.keys().hasAll(['palette', 'material', 'baseFreqHz', 'screenCount', 'edgeCount']) &&
+        summary.keys().hasOnly(['palette', 'material', 'baseFreqHz', 'screenCount', 'edgeCount']) &&
+        summary.palette is string &&
+        summary.palette.size() >= 1 &&
+        summary.palette.size() <= 40 &&
+        summary.palette in ['pearl-flebologia', 'finance-ice', 'emerald-clinic'] &&
+        summary.material is string &&
+        summary.material.size() >= 1 &&
+        summary.material.size() <= 40 &&
+        summary.material in ['shiny-glass', 'frosted-glass', 'matte-metal', 'abs-plastic', 'suede'] &&
+        summary.baseFreqHz is number &&
+        summary.baseFreqHz >= 30 &&
+        summary.baseFreqHz < 160 &&
+        summary.screenCount is number &&
+        summary.screenCount >= 1 &&
+        summary.screenCount <= 40 &&
+        summary.edgeCount is number &&
+        summary.edgeCount >= 0 &&
+        summary.edgeCount <= 80;
+    }
+
+    function isValidDepthMap(d) {
+      return d is map &&
+        d.keys().hasAll(['elevation', 'blur', 'glassBlur', 'glassOpacity', 'borderRadius', 'specularRim']) &&
+        d.keys().hasOnly(['elevation', 'blur', 'glassBlur', 'glassOpacity', 'borderRadius', 'specularRim']) &&
+        d.elevation is number &&
+        d.blur is number &&
+        d.glassBlur is number &&
+        d.glassOpacity is number &&
+        d.borderRadius is number &&
+        d.specularRim is number;
+    }
+
+    function isValidSynthMap(s) {
+      return s is map &&
+        s.keys().hasAll([
+          'waveform',
+          'baseFrequency',
+          'harmonicRatio',
+          'filterCutoff',
+          'filterResonance',
+          'attackMs',
+          'decayMs',
+          'reverbMix',
+          'subBassLevel'
+        ]) &&
+        s.keys().hasOnly([
+          'waveform',
+          'baseFrequency',
+          'harmonicRatio',
+          'filterCutoff',
+          'filterResonance',
+          'attackMs',
+          'decayMs',
+          'reverbMix',
+          'subBassLevel'
+        ]) &&
+        s.waveform is string && s.waveform.size() >= 1 && s.waveform.size() <= 24 &&
+        s.baseFrequency is number && s.baseFrequency >= 30 && s.baseFrequency < 160 &&
+        s.harmonicRatio is number &&
+        s.filterCutoff is number &&
+        s.filterResonance is number &&
+        s.attackMs is number &&
+        s.decayMs is number &&
+        s.reverbMix is number &&
+        s.subBassLevel is number;
+    }
+
+    function isValidHapticMap(h) {
+      return h is map &&
+        h.keys().hasAll([
+          'enabled',
+          'material',
+          'intensity',
+          'durationMs',
+          'materialHardness',
+          'reverseClutchForce',
+          'holdRampMultiplier',
+          'activePatternId'
+        ]) &&
+        h.keys().hasOnly([
+          'enabled',
+          'material',
+          'intensity',
+          'durationMs',
+          'materialHardness',
+          'reverseClutchForce',
+          'holdRampMultiplier',
+          'activePatternId'
+        ]) &&
+        h.enabled is bool &&
+        h.material is string &&
+        h.material.size() >= 1 &&
+        h.material.size() <= 40 &&
+        h.material in ['shiny-glass', 'frosted-glass', 'matte-metal', 'abs-plastic', 'suede'] &&
+        h.intensity is number &&
+        h.durationMs is number &&
+        h.materialHardness is number &&
+        h.reverseClutchForce is number &&
+        h.holdRampMultiplier is number &&
+        h.activePatternId is string && h.activePatternId.size() >= 1 && h.activePatternId.size() <= 128;
+    }
+
+    function isValidEngravingMap(e) {
+      return e is map &&
+        e.keys().hasAll(['symbol', 'glowEnabled', 'glowColor', 'glowIntensity', 'etchDepth']) &&
+        e.keys().hasOnly(['symbol', 'glowEnabled', 'glowColor', 'glowIntensity', 'etchDepth']) &&
+        e.symbol is string && e.symbol.size() >= 1 && e.symbol.size() <= 40 &&
+        e.glowEnabled is bool &&
+        e.glowColor is string && e.glowColor.size() >= 3 && e.glowColor.size() <= 32 &&
+        e.glowIntensity is number &&
+        e.etchDepth is number;
+    }
+
+    function isValidAnimationMap(a) {
+      return a is map &&
+        a.keys().hasAll([
+          'stiffness',
+          'damping',
+          'mass',
+          'pressScale',
+          'rippleDurationMs',
+          'glowSpread',
+          'holdTremorHz',
+          'motionPreset',
+          'illuminationPreset',
+          'aiNote'
+        ]) &&
+        a.keys().hasOnly([
+          'stiffness',
+          'damping',
+          'mass',
+          'pressScale',
+          'rippleDurationMs',
+          'glowSpread',
+          'holdTremorHz',
+          'motionPreset',
+          'illuminationPreset',
+          'aiNote'
+        ]) &&
+        a.stiffness is number &&
+        a.damping is number &&
+        a.mass is number &&
+        a.pressScale is number &&
+        a.rippleDurationMs is number &&
+        a.glowSpread is number &&
+        a.holdTremorHz is number &&
+        a.motionPreset is string && a.motionPreset.size() >= 1 && a.motionPreset.size() <= 64 &&
+        a.illuminationPreset is string && a.illuminationPreset.size() >= 1 && a.illuminationPreset.size() <= 64 &&
+        a.aiNote is string && a.aiNote.size() <= 1200;
+    }
+
+    function isValidDriverCalibrationMap(dc) {
+      return dc is map &&
+        dc.keys().hasAll([
+          'detentCount',
+          'sweepAngleDeg',
+          'lowBodyFreqHz',
+          'mouseSnapBlend',
+          'rotaryHapticStrength',
+          'tickPulseMs',
+          'majorTickEvery',
+          'majorTickAccent',
+          'endStopResistance',
+          'axialPushForce',
+          'backlashClutch'
+        ]) &&
+        dc.keys().hasOnly([
+          'detentCount',
+          'sweepAngleDeg',
+          'lowBodyFreqHz',
+          'mouseSnapBlend',
+          'rotaryHapticStrength',
+          'tickPulseMs',
+          'majorTickEvery',
+          'majorTickAccent',
+          'endStopResistance',
+          'axialPushForce',
+          'backlashClutch'
+        ]) &&
+        dc.detentCount is number &&
+        dc.sweepAngleDeg is number &&
+        dc.lowBodyFreqHz is number && dc.lowBodyFreqHz >= 30 && dc.lowBodyFreqHz < 160 &&
+        dc.mouseSnapBlend is number &&
+        dc.rotaryHapticStrength is number &&
+        dc.tickPulseMs is number &&
+        dc.majorTickEvery is number &&
+        dc.majorTickAccent is number &&
+        dc.endStopResistance is number &&
+        dc.axialPushForce is number &&
+        dc.backlashClutch is number;
+    }
+
+    function isValidScreenMapState(screenMap) {
+      return screenMap is map &&
+        screenMap.keys().hasAll(['id', 'name', 'description', 'sourceRepo', 'defaultTransition', 'nodes', 'edges']) &&
+        screenMap.keys().hasOnly(['id', 'name', 'description', 'sourceRepo', 'defaultTransition', 'nodes', 'edges', 'githubMeta']) &&
+        screenMap.id is string && screenMap.id.size() >= 1 && screenMap.id.size() <= 128 &&
+        screenMap.name is string && screenMap.name.size() >= 1 && screenMap.name.size() <= 240 &&
+        screenMap.description is string && screenMap.description.size() <= 1600 &&
+        screenMap.sourceRepo is string && screenMap.sourceRepo.size() >= 1 && screenMap.sourceRepo.size() <= 240 &&
+        screenMap.defaultTransition is string && screenMap.defaultTransition.size() >= 1 && screenMap.defaultTransition.size() <= 64 &&
+        screenMap.nodes is list && screenMap.nodes.size() >= 1 && screenMap.nodes.size() <= 40 &&
+        (screenMap.nodes.size() > 0 ? screenMap.nodes[0] is map : false) &&
+        screenMap.edges is list && screenMap.edges.size() <= 80 &&
+        (screenMap.edges.size() > 0 ? screenMap.edges[0] is map : true) &&
+        ('githubMeta' in screenMap ? (screenMap.githubMeta is map && screenMap.githubMeta.keys().size() <= 12) : true);
+    }
+
+    function isValidSnapshotState(state) {
+      return state is map &&
+        state.keys().hasAll([
+          'palette',
+          'activeScreenTransition',
+          'selectedGroups',
+          'depth',
+          'synth',
+          'haptic',
+          'engraving',
+          'animation',
+          'groupConfigs',
+          'driverCalibration',
+          'screenMap'
+        ]) &&
+        state.keys().hasOnly([
+          'palette',
+          'activeScreenTransition',
+          'selectedGroups',
+          'depth',
+          'synth',
+          'haptic',
+          'engraving',
+          'animation',
+          'groupConfigs',
+          'driverCalibration',
+          'screenMap'
+        ]) &&
+        state.palette is string &&
+        state.palette.size() >= 1 &&
+        state.palette.size() <= 40 &&
+        state.palette in ['pearl-flebologia', 'finance-ice', 'emerald-clinic'] &&
+        state.activeScreenTransition is string &&
+        state.activeScreenTransition.size() >= 1 &&
+        state.activeScreenTransition.size() <= 64 &&
+        state.selectedGroups is list &&
+        state.selectedGroups.size() <= 6 &&
+        (state.selectedGroups.size() > 0 ? (state.selectedGroups[0] is string && state.selectedGroups[0].size() >= 1 && state.selectedGroups[0].size() <= 40) : true) &&
+        isValidDepthMap(state.depth) &&
+        isValidSynthMap(state.synth) &&
+        isValidHapticMap(state.haptic) &&
+        isValidEngravingMap(state.engraving) &&
+        isValidAnimationMap(state.animation) &&
+        state.groupConfigs is map &&
+        state.groupConfigs.keys().hasAll(['group-primary', 'group-diagnostic', 'group-audio']) &&
+        state.groupConfigs.keys().hasOnly(['group-primary', 'group-diagnostic', 'group-audio']) &&
+        isValidDriverCalibrationMap(state.driverCalibration) &&
+        isValidScreenMapState(state.screenMap);
+    }
+
+    function isValidStudioSnapshot(data) {
+      return data is map &&
+        data.keys().hasAll([
+          'ownerId',
+          'label',
+          'note',
+          'versionTag',
+          'isPinned',
+          'summary',
+          'state',
+          'createdAt',
+          'updatedAt'
+        ]) &&
+        data.keys().hasOnly([
+          'ownerId',
+          'label',
+          'note',
+          'versionTag',
+          'isPinned',
+          'summary',
+          'state',
+          'createdAt',
+          'updatedAt'
+        ]) &&
+        data.ownerId is string &&
+        data.ownerId.size() >= 1 &&
+        data.ownerId.size() <= 128 &&
+        data.ownerId.matches('^[a-zA-Z0-9_-]+$') &&
+        data.ownerId == request.auth.uid &&
+        data.label is string &&
+        data.label.size() >= 1 &&
+        data.label.size() <= 160 &&
+        data.note is string &&
+        data.note.size() >= 0 &&
+        data.note.size() <= 600 &&
+        data.versionTag is string &&
+        data.versionTag.size() >= 2 &&
+        data.versionTag.size() <= 32 &&
+        data.versionTag.matches('^v[0-9]+[.][0-9]+([.][0-9]+)?$') &&
+        data.isPinned is bool &&
+        isValidSnapshotSummary(data.summary) &&
+        isValidSnapshotState(data.state) &&
+        data.createdAt is timestamp &&
+        data.updatedAt is timestamp;
+    }
+
+    // Per-user Studio Version History Snapshots
+    match /studio_snapshots/{snapshotId} {
+      allow get: if isSignedIn() &&
+        isEmailVerified() &&
+        isValidId(snapshotId) &&
+        existing().ownerId == request.auth.uid;
+
+      allow list: if isSignedIn() &&
+        isEmailVerified() &&
+        resource.data.ownerId == request.auth.uid;
+
+      allow create: if isSignedIn() &&
+        isEmailVerified() &&
+        isValidId(snapshotId) &&
+        isValidStudioSnapshot(incoming()) &&
+        incoming().createdAt == request.time &&
+        incoming().updatedAt == request.time;
+
+      allow update: if (
+        isSignedIn() &&
+        isEmailVerified() &&
+        isValidStudioSnapshot(incoming()) &&
+        isValidId(snapshotId) &&
+        existing().ownerId == request.auth.uid &&
+        incoming().ownerId == existing().ownerId &&
+        incoming().createdAt == existing().createdAt &&
+        incoming().versionTag == existing().versionTag &&
+        incoming().updatedAt == request.time &&
+        (
+          // Action: EditMetadata (rename snapshot label or update note)
+          incoming().diff(existing()).affectedKeys().hasOnly(['label', 'note', 'updatedAt']) ||
+          // Action: TogglePin
+          incoming().diff(existing()).affectedKeys().hasOnly(['isPinned', 'updatedAt'])
+        )
+      );
+
+      allow delete: if isSignedIn() &&
+        isEmailVerified() &&
+        isValidId(snapshotId) &&
+        existing().ownerId == request.auth.uid;
+    }
+  }
+}
